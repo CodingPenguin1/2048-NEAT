@@ -6,6 +6,7 @@ from Board import Board
 class Bot:
     def __init__(self, boardSize=(4, 4)):
         self.board = Board(boardSize[0], boardSize[1])
+        self.isRunning = True
 
         # For learning
         self.fitness = self.board.score
@@ -39,3 +40,6 @@ class Bot:
 
         # Update fitness
         self.fitness = self.board.score
+
+        # Update isRunning of game is over
+        self.isRunning = self.board.gameOver
