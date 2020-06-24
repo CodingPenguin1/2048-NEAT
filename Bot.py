@@ -22,7 +22,9 @@ class Bot:
         # Run the bot until the game is over
         while not self.board.checkGameOver():
             # Define input vector
-            maxPossibleTileValue = len(self.board.array) * len(self.board.array[0])
+
+            # The board itself
+            maxPossibleTileValue = 2 ** (1 + len(self.board.array) * len(self.board.array[0]))
             inputs = []
             for row in range(len(self.board.array)):
                 for col in range(len(self.board.array[0])):
@@ -30,10 +32,21 @@ class Bot:
                         inputs.append(0)
                     else:
                         inputs.append(log2(self.board.array[row][col]) / maxPossibleTileValue)
+
+            # The number of nonzero tiles
+            nonZeroTileCount = 0
+            for row in range(len(self.board.array)):
+                for col in range(len(self.board.array[0])):
+                    if self.board.array[row][col] != 0:
+                        nonZeroTileCount += 1
+            nonZeroTileCount /= len(self.board.array) + len(self.board.array[0])
+            inputs.append(nonZeroTileCount)
+
+            # Reference value
             inputs.append(1.0)
 
             # Do the black magic and get outputs
-            outputs = self.brain.activate(inputs) if self.brain is not None else (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+            outputs = self.brain.activate(inputs) if self.brain is not None else [0 for _ in range(len(self.board.array) * len(self.board.array[0]) + 2)]
 
             # Try moves from highest to lowest value
             # If a proposed move does nothing, try the next most favored

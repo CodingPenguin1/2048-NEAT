@@ -1,39 +1,55 @@
 #!/usr/bin/env python
-import threading
-from multiprocessing import cpu_count
-from random import randint
-from time import sleep, time
+import concurrent.futures
 
 import neat
-import numpy as np
-
-from Bot import Bot
 from progress.bar import IncrementalBar
 
+from Bot import Bot
 
 # Global Constants
-CPU_COUNT = cpu_count()
 BOTS_PER_GENOME = 5
+
+# Global Vars
+highScore = 0
+
+
+def runGenome(genome, genomeID, config):
+    highScore = 0
+    genome.fitness = 0
+    for i in range(BOTS_PER_GENOME):
+        bot = Bot()
+        bot.brain = neat.nn.FeedForwardNetwork.create(genome, config)
+        bot.useBrain()
+        genome.fitness += bot.fitness
+        if bot.fitness > highScore:
+            highScore = bot.fitness
+    # Average bot fitnesses to get overall genome fitness
+    genome.fitness /= BOTS_PER_GENOME
+    return genome.fitness, genomeID, highScore
 
 
 def runGeneration(genomes, config):
-    # Generation timer
-    genStart = time()
+    global highScore
 
-    # TODO: multiprocess this
     # Create, run, and evalute the genomes
-    bar = IncrementalBar('Running Bots', max=len(genomes) * BOTS_PER_GENOME)
-    for i, (genomeID, genome) in enumerate(genomes):
-        genome.fitness = 0
-        for j in range(BOTS_PER_GENOME):
-            bot = Bot()
-            bot.brain = neat.nn.FeedForwardNetwork.create(genome, config)  # Create
-            bot.useBrain()  # Run
-            genome.fitness += bot.fitness  # Evaluate
-            bar.next()
-        # Average bot fitnesses to get overall genome fitness
-        genome.fitness /= BOTS_PER_GENOME
-    bar.finish()
+    with concurrent.futures.ProcessPoolExecutor() as executor:
+        evaluatedGenomes = [executor.submit(runGenome, genome, genomeID, config) for (genomeID, genome) in genomes]
+
+        with IncrementalBar('Running bots', max=len(genomes)) as bar:
+            for completed in concurrent.futures.as_completed(evaluatedGenomes):
+                # Update genome fitness
+                fitness, ID, bestGenomeScore = completed.result()
+                for (genomeID, genome) in genomes:
+                    if genomeID == ID:
+                        genome.fitness = fitness
+
+                # Update high score
+                if bestGenomeScore > highScore:
+                    highScore = bestGenomeScore
+                bar.next()
+
+    # Print max score (fitness) so far
+    print(f'High Score: {highScore}')
 
 
 if __name__ == '__main__':
