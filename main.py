@@ -35,7 +35,7 @@ def runGeneration(genomes, config):
     with concurrent.futures.ProcessPoolExecutor() as executor:
         evaluatedGenomes = [executor.submit(runGenome, genome, genomeID, config) for (genomeID, genome) in genomes]
 
-        with IncrementalBar('Running bots', max=len(genomes)) as bar:
+        with IncrementalBar('Running genomes', max=len(genomes)) as bar:
             for completed in concurrent.futures.as_completed(evaluatedGenomes):
                 # Update genome fitness
                 fitness, ID, bestGenomeScore = completed.result()
