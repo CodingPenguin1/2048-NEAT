@@ -14,7 +14,7 @@ class Bot:
         self.genomeID = None
 
     def reset(self):
-        self.board = Board(len(board), len(board[0]))
+        self.board = Board(len(self.board.array), len(self.board.array[0]))
 
     def useBrain(self, light):
         # 16 inputs: each cell of the board scaled by log2(x)/(width*height)

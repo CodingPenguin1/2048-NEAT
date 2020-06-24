@@ -72,12 +72,15 @@ if __name__ == '__main__':
     # Create the population, which is the top-level object for a NEAT run
     population = neat.Population(config)
 
+    # Add reporter so I can see stuff happen
     population.add_reporter(neat.StdOutReporter(True))
     stats = neat.StatisticsReporter()
     population.add_reporter(stats)
 
     # Create list of bots
     bots = [Bot() for _ in range(NUM_BOTS)]
+
+    print(bots)
 
     # Train the population
     winner = population.run(evalGenomes)
