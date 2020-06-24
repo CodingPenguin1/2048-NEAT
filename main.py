@@ -8,42 +8,42 @@ import neat
 import numpy as np
 
 from Bot import Bot
+from progress.bar import IncrementalBar
+
 
 # Global Constants
-NUM_BOTS = 0 # This gets updated when reading the config file
 CPU_COUNT = cpu_count()
+BOTS_PER_GENOME = 5
 
 # Global Vars
 genNum = 0
 
 
 def runGeneration(genomes, config):
+    global genNum
+
     # Generation timer
     genStart = time()
 
-    # Create the neural networks
+    # TODO: multiprocess this
+    # Create, run, and evalute the genomes
+    bar = IncrementalBar('Running Bots', max=len(genomes) * BOTS_PER_GENOME)
     for i, (genomeID, genome) in enumerate(genomes):
-        bot = bots[i]
         genome.fitness = 0
-        bot.brain = neat.nn.FeedForwardNetwork.create(genome, config)
-        bot.fitness = 0
-        bot.genome = genome
-        bot.genomeID = genomeID
-
-    # Running the bots
-    for bot in bots:
-        bot.useBrain()
+        for j in range(BOTS_PER_GENOME):
+            bot = Bot()
+            bot.brain = neat.nn.FeedForwardNetwork.create(genome, config)  # Create
+            bot.useBrain()  # Run
+            genome.fitness += bot.fitness  # Evaluate
+            bar.next()
+        # Average bot fitnesses to get overall genome fitness
+        genome.fitness /= BOTS_PER_GENOME
+    bar.finish()
 
     # Logging
     genDuration = time() - genStart
     print(f'Generation {genNum} completed in {genDuration}s')
     genNum += 1
-
-    # Evaluate genomes and set up for next generation
-    for bot in bots:
-        if bot.genome is not None:
-            bot.genome.fitness = bot.fitness
-        bot.reset()
 
 
 if __name__ == '__main__':
@@ -52,15 +52,6 @@ if __name__ == '__main__':
                          neat.DefaultSpeciesSet, neat.DefaultStagnation,
                          'config')
 
-    # Load some params from config into code
-    with open('config', 'r') as f:
-        lines = f.readlines()
-        for line in lines:
-            if line.startswith('pop_size'):
-                NUM_BOTS = int(line[line.find('= ') + 2:].strip())
-                break
-    print(f'Bot count: {NUM_BOTS}')
-
     # Create the population, which is the top-level object for a NEAT run
     population = neat.Population(config)
 
@@ -68,9 +59,6 @@ if __name__ == '__main__':
     population.add_reporter(neat.StdOutReporter(True))
     stats = neat.StatisticsReporter()
     population.add_reporter(stats)
-
-    # Create list of bots
-    bots = [Bot() for _ in range(NUM_BOTS)]
 
     # Train the population
     winner = population.run(runGeneration)

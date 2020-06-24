@@ -1,4 +1,5 @@
 from math import log2
+from random import randint
 
 from Board import Board
 
@@ -11,11 +12,6 @@ class Bot:
         # For learning
         self.fitness = self.board.score
         self.brain = None
-        self.genome = None
-        self.genomeID = None
-
-    def reset(self):
-        self.board = Board(len(self.board.array), len(self.board.array[0]))
 
     def useBrain(self):
         # 16 inputs: each cell of the board scaled by log2(x)/(width*height)
@@ -35,10 +31,22 @@ class Bot:
             inputs.append(1.0)
 
             # Do the black magic and get outputs
-            outputs = self.brain.activate(inputs) if self.brain is not None else (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+            outputs = self.brain.activate(inputs) if self.brain is not None else (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
 
-            # Get the index of the max value of outputs and convert to string
-            direction = ['left', 'right', 'up', 'down'][outputs.index(max(outputs))]
+            # Get max value of outputs
+            maxVal = max(outputs)
+
+            # Find indicies of maxVal
+            options = []
+            for i in range(len(outputs)):
+                if outputs[i] == maxVal:
+                    options.append(i)
+
+            # Pick a random option
+            selection = options[randint(0, len(options) - 1)]
+
+            # Convert option to string
+            direction = ['left', 'right', 'up', 'down'][selection]
 
             # Update board
             self.board.shift(direction)
