@@ -14,22 +14,14 @@ NUM_BOTS = 0 # This gets updated when reading the config file
 CPU_COUNT = cpu_count()
 
 # Global Vars
-genStart = 0
 genNum = 0
 
 
-def update(dt):
+def runGeneration(genomes, config):
+    # Generation timer
     genStart = time()
-    botsRunning = 0
-    genTimer = int(time() - genStart)
 
-    for bot in bots:
-        bot.useBrain()
-
-
-def evalGenomes(genomes, config):
-    global genStart, genNum
-
+    # Create the neural networks
     for i, (genomeID, genome) in enumerate(genomes):
         bot = bots[i]
         genome.fitness = 0
@@ -38,16 +30,16 @@ def evalGenomes(genomes, config):
         bot.genome = genome
         bot.genomeID = genomeID
 
-    botsRunning = len(genomes)
+    # Running the bots
+    for bot in bots:
+        bot.useBrain()
 
-    genStart = time()
-
-    while botsRunning > 1:
-        sleep(0.1)
-
-    print('Generation completed')
+    # Logging
+    genDuration = time() - genStart
+    print(f'Generation {genNum} completed in {genDuration}s')
     genNum += 1
 
+    # Evaluate genomes and set up for next generation
     for bot in bots:
         if bot.genome is not None:
             bot.genome.fitness = bot.fitness
@@ -80,9 +72,7 @@ if __name__ == '__main__':
     # Create list of bots
     bots = [Bot() for _ in range(NUM_BOTS)]
 
-    print(bots)
-
     # Train the population
-    winner = population.run(evalGenomes)
+    winner = population.run(runGeneration)
 
     # TODO: add visualization (https://neat-python.readthedocs.io/en/latest/xor_example.html)
