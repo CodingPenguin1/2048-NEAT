@@ -42,11 +42,28 @@ class Bot:
             nonZeroTileCount /= len(self.board.array) + len(self.board.array[0])
             inputs.append(nonZeroTileCount)
 
+            # What each board would look like with each potential move from the current board
+            # for direction in ['left', 'right', 'up', 'down']:
+            #     nextBoard = self.board.shift(direction, changeScore=False)
+            #     nextBoard = np.reshape(nextBoard, (1, len(nextBoard) * len(nextBoard[0])))[0]
+
+            #     nextBoardList = []
+            #     for i in range(len(nextBoard)):
+            #         nextBoardList.append(nextBoard[i])
+
+            #     for i in range(len(nextBoardList)):
+            #         if nextBoardList[i] > 0:
+            #             nextBoardList[i] = log2(nextBoardList[i]) / maxPossibleTileValue
+
+            #     for i in nextBoardList:
+            #         inputs.append(i)
+
             # Reference value
             inputs.append(1.0)
+            # print(inputs)
 
             # Do the black magic and get outputs
-            outputs = self.brain.activate(inputs) if self.brain is not None else [0 for _ in range(len(self.board.array) * len(self.board.array[0]) + 2)]
+            outputs = self.brain.activate(inputs) if self.brain is not None else [0 for _ in range(5 * len(self.board.array) * len(self.board.array[0]) + 2)]
 
             # Try moves from highest to lowest value
             # If a proposed move does nothing, try the next most favored
@@ -56,7 +73,7 @@ class Bot:
                 direction = directions[bestOption]
 
                 # See if move does anything
-                candidateArray = self.board.shift(direction)
+                candidateArray = self.board.shift(direction, changeScore=False)
                 if not np.array_equal(candidateArray, self.board.array):
                     break
                 else:

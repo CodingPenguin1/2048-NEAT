@@ -16,28 +16,28 @@ class Board:
     def move(self, direction):
         self.array = self.shift(direction)
 
-    def shift(self, direction):
+    def shift(self, direction, changeScore=True):
         arrayCopy = np.copy(self.array)
 
         if not self.gameOver:
             if direction == 'left':
                 for i, row in enumerate(arrayCopy):
-                    arrayCopy[i] = self.shiftRow(row)
+                    arrayCopy[i] = self.shiftRow(row, changeScore=changeScore)
             elif direction == 'right':
                 arrayCopy = np.flip(arrayCopy, 1)
                 for i, row in enumerate(arrayCopy):
-                    arrayCopy[i] = self.shiftRow(row)
+                    arrayCopy[i] = self.shiftRow(row, changeScore=changeScore)
                 arrayCopy = np.flip(arrayCopy, 1)
             elif direction == 'up':
                 arrayCopy = np.transpose(arrayCopy)
                 for i, row in enumerate(arrayCopy):
-                    arrayCopy[i] = self.shiftRow(row)
+                    arrayCopy[i] = self.shiftRow(row, changeScore=changeScore)
                 arrayCopy = np.transpose(arrayCopy)
             else:
                 arrayCopy = np.transpose(arrayCopy)
                 arrayCopy = np.flip(arrayCopy, 1)
                 for i, row in enumerate(arrayCopy):
-                    arrayCopy[i] = self.shiftRow(row)
+                    arrayCopy[i] = self.shiftRow(row, changeScore=changeScore)
                 arrayCopy = np.flip(arrayCopy, 1)
                 arrayCopy = np.transpose(arrayCopy)
 
@@ -47,7 +47,7 @@ class Board:
                 self.summonNewTile()
         return arrayCopy
 
-    def shiftRow(self, row, debug=False):
+    def shiftRow(self, row, debug=False, changeScore=True):
         # Shifts elements in a row, combining as necessary
         # Shifts the list "row" to the left
 
