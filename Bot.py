@@ -42,29 +42,36 @@ class Bot:
             nonZeroTileCount /= len(self.board.array) + len(self.board.array[0])
             inputs.append(nonZeroTileCount)
 
-            # TODO: make a new board instead of using the bot's
             # What each board would look like with each potential move from the current board
-            # for direction in ['left', 'right', 'up', 'down']:
-            #     nextBoard = self.board.shift(direction, changeScore=False)
-            #     nextBoard = np.reshape(nextBoard, (1, len(nextBoard) * len(nextBoard[0])))[0]
+            for direction in ['left', 'right', 'up', 'down']:
+                nextBoard = Board(len(self.board.array), len(self.board.array[0]))
+                nextBoard.array = np.copy(self.board.array)
+                nextBoard.move(direction)
+                score = nextBoard.score
 
-            #     nextBoardList = []
-            #     for i in range(len(nextBoard)):
-            #         nextBoardList.append(nextBoard[i])
+                # Move board array into a list and scale
+                nextBoardValues = []
+                for row in nextBoard.array:
+                    for cell in row:
+                        if cell != 0:
+                            nextBoardValues.append(log2(cell) / maxPossibleTileValue)
+                        else:
+                            nextBoardValues.append(cell)
 
-            #     for i in range(len(nextBoardList)):
-            #         if nextBoardList[i] > 0:
-            #             nextBoardList[i] = log2(nextBoardList[i]) / maxPossibleTileValue
+                # Add to score
+                for i in nextBoardValues:
+                    inputs.append(i)
+                inputs.append(score)
 
-            #     for i in nextBoardList:
-            #         inputs.append(i)
+
+
 
             # Reference value
             inputs.append(1.0)
             # print(inputs)
 
             # Do the black magic and get outputs
-            outputs = self.brain.activate(inputs) if self.brain is not None else [0 for _ in range(5 * len(self.board.array) * len(self.board.array[0]) + 2)]
+            outputs = self.brain.activate(inputs) if self.brain is not None else [0 for _ in range(5 * (len(self.board.array) * len(self.board.array[0]) + 1) + 2)]
 
             # Try moves from highest to lowest value
             # If a proposed move does nothing, try the next most favored
