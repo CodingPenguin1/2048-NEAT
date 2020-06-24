@@ -15,13 +15,8 @@ from progress.bar import IncrementalBar
 CPU_COUNT = cpu_count()
 BOTS_PER_GENOME = 5
 
-# Global Vars
-genNum = 0
-
 
 def runGeneration(genomes, config):
-    global genNum
-
     # Generation timer
     genStart = time()
 
@@ -39,11 +34,6 @@ def runGeneration(genomes, config):
         # Average bot fitnesses to get overall genome fitness
         genome.fitness /= BOTS_PER_GENOME
     bar.finish()
-
-    # Logging
-    genDuration = time() - genStart
-    print(f'Generation {genNum} completed in {genDuration}s')
-    genNum += 1
 
 
 if __name__ == '__main__':

@@ -13,33 +13,39 @@ class Board:
 
         self.initialize()
 
+    def move(self, direction):
+        self.array = self.shift(direction)
+
     def shift(self, direction):
+        arrayCopy = np.copy(self.array)
+
         if not self.gameOver:
             if direction == 'left':
-                for i, row in enumerate(self.array):
-                    self.array[i] = self.shiftRow(row)
+                for i, row in enumerate(arrayCopy):
+                    arrayCopy[i] = self.shiftRow(row)
             elif direction == 'right':
-                self.array = np.flip(self.array, 1)
-                for i, row in enumerate(self.array):
-                    self.array[i] = self.shiftRow(row)
-                self.array = np.flip(self.array, 1)
+                arrayCopy = np.flip(arrayCopy, 1)
+                for i, row in enumerate(arrayCopy):
+                    arrayCopy[i] = self.shiftRow(row)
+                arrayCopy = np.flip(arrayCopy, 1)
             elif direction == 'up':
-                self.array = np.transpose(self.array)
-                for i, row in enumerate(self.array):
-                    self.array[i] = self.shiftRow(row)
-                self.array = np.transpose(self.array)
+                arrayCopy = np.transpose(arrayCopy)
+                for i, row in enumerate(arrayCopy):
+                    arrayCopy[i] = self.shiftRow(row)
+                arrayCopy = np.transpose(arrayCopy)
             else:
-                self.array = np.transpose(self.array)
-                self.array = np.flip(self.array, 1)
-                for i, row in enumerate(self.array):
-                    self.array[i] = self.shiftRow(row)
-                self.array = np.flip(self.array, 1)
-                self.array = np.transpose(self.array)
+                arrayCopy = np.transpose(arrayCopy)
+                arrayCopy = np.flip(arrayCopy, 1)
+                for i, row in enumerate(arrayCopy):
+                    arrayCopy[i] = self.shiftRow(row)
+                arrayCopy = np.flip(arrayCopy, 1)
+                arrayCopy = np.transpose(arrayCopy)
 
             # Check if game is over
             self.gameOver = self.checkGameOver()
             if not self.gameOver:
                 self.summonNewTile()
+        return arrayCopy
 
     def shiftRow(self, row, debug=False):
         # Shifts elements in a row, combining as necessary

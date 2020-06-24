@@ -1,6 +1,8 @@
 from math import log2
 from random import randint
 
+import numpy as np
+
 from Board import Board
 
 
@@ -33,23 +35,22 @@ class Bot:
             # Do the black magic and get outputs
             outputs = self.brain.activate(inputs) if self.brain is not None else (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
 
-            # Get max value of outputs
-            maxVal = max(outputs)
+            # Try moves from highest to lowest value
+            # If a proposed move does nothing, try the next most favored
+            directions = ['left', 'right', 'up', 'down']
+            while True:
+                bestOption = outputs.index(max(outputs))
+                direction = directions[bestOption]
 
-            # Find indicies of maxVal
-            options = []
-            for i in range(len(outputs)):
-                if outputs[i] == maxVal:
-                    options.append(i)
-
-            # Pick a random option
-            selection = options[randint(0, len(options) - 1)]
-
-            # Convert option to string
-            direction = ['left', 'right', 'up', 'down'][selection]
+                # See if move does anything
+                candidateArray = self.board.shift(direction)
+                if not np.array_equal(candidateArray, self.board.array):
+                    break
+                else:
+                    outputs[bestOption] = -1
 
             # Update board
-            self.board.shift(direction)
+            self.board.move(direction)
 
         # Update fitness
         self.fitness = self.board.score
