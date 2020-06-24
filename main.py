@@ -4,6 +4,7 @@ import concurrent.futures
 import neat
 from progress.bar import IncrementalBar
 
+import visualize
 from Bot import Bot
 
 # Global Constants
