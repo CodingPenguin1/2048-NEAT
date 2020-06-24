@@ -12,10 +12,12 @@ BOTS_PER_GENOME = 5
 
 # Global Vars
 highScore = 0
+highTile = 0
 
 
 def runGenome(genome, genomeID, config):
     highScore = 0
+    highTile = 0
     genome.fitness = 0
     for i in range(BOTS_PER_GENOME):
         bot = Bot()
@@ -26,11 +28,18 @@ def runGenome(genome, genomeID, config):
             highScore = bot.fitness
     # Average bot fitnesses to get overall genome fitness
     genome.fitness /= BOTS_PER_GENOME
-    return genome.fitness, genomeID, highScore
+
+    # Get high tile
+    for row in bot.board.array:
+        for cell in row:
+            if cell > highTile:
+                highTile = cell
+
+    return genome.fitness, genomeID, highScore, highTile
 
 
 def runGeneration(genomes, config):
-    global highScore
+    global highScore, highTile
 
     # Create, run, and evalute the genomes
     with concurrent.futures.ProcessPoolExecutor() as executor:
@@ -39,18 +48,22 @@ def runGeneration(genomes, config):
         with IncrementalBar('Running genomes', max=len(genomes)) as bar:
             for completed in concurrent.futures.as_completed(evaluatedGenomes):
                 # Update genome fitness
-                fitness, ID, bestGenomeScore = completed.result()
+                fitness, ID, bestGenomeScore, bestGenomeTile = completed.result()
                 for (genomeID, genome) in genomes:
                     if genomeID == ID:
                         genome.fitness = fitness
 
-                # Update high score
+                # Update high score and tile
                 if bestGenomeScore > highScore:
                     highScore = bestGenomeScore
+                if bestGenomeTile > highTile:
+                    highTile = bestGenomeTile
+
                 bar.next()
 
-    # Print max score (fitness) so far
+    # Print max score and tile so far
     print(f'High Score: {highScore}')
+    print(f'High Tile: {highTile}')
 
 
 if __name__ == '__main__':
