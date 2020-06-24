@@ -42,6 +42,7 @@ class Bot:
             nonZeroTileCount /= len(self.board.array) + len(self.board.array[0])
             inputs.append(nonZeroTileCount)
 
+            # TODO: make a new board instead of using the bot's
             # What each board would look like with each potential move from the current board
             # for direction in ['left', 'right', 'up', 'down']:
             #     nextBoard = self.board.shift(direction, changeScore=False)
