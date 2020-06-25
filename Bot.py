@@ -24,9 +24,6 @@ class Bot:
         if printGame:
             print(self.board, '\n')
 
-        # Save the previous 3 moves to make sure it doesn't do the same thing over and over
-        moveHistory = []
-
         # Run the bot until the game is over
         while not self.board.checkGameOver():
             # Define input vector
@@ -60,32 +57,17 @@ class Bot:
             # Do the black magic and get output
             outputs = self.brain.activate(inputs) if self.brain is not None else [0 for _ in range(86)]
 
-            # Figure out which moves are available
-            lockedMove = None
-            if len(moveHistory) >= 3:
-                for move in moveHistory:
-                    if moveHistory.count(move) == len(moveHistory):
-                        lockedMove = move
-                        break
+            directions = ['left', 'right', 'up', 'down']
 
-            # Pick a direction
-            if outputs[0] <= 0.25:
-                direction = 'left'
-            elif outputs[0] <= 0.5:
-                direction = 'right'
-            elif outputs[0] <= 0.75:
-                direction = 'up'
-            else:
-                direction = 'down'
+            # Make all unavailable moves have tiny activation values
+            for i in range(len(outputs)):
+                if np.array_equal(self.board.peek(directions[i])[0], self.board.array):
+                    outputs[i] = -100000
 
-            # Pick a random direction if the move selected is locked
-            while direction == lockedMove:
-                direction = ['left', 'right', 'up', 'down'][randint(0, 3)]
-
-            # Update move history
-            moveHistory.append(direction)
-            if len(moveHistory) > 3:
-                moveHistory.pop(0)
+            # Pick the best output
+            maxActivation = max(outputs)
+            maxActivationIndex = outputs.index(maxActivation)
+            direction = directions[maxActivationIndex]
 
             # Update board
             self.board.move(direction)
