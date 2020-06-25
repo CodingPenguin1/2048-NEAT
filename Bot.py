@@ -20,6 +20,9 @@ class Bot:
         #            the count of nonzero cells
         # 1 output: direction to move
 
+        # Save the previous 3 moves to make sure it doesn't do the same thing over and over
+        moveHistory = []
+
         # Run the bot until the game is over
         while not self.board.checkGameOver():
             # Define input vector
@@ -43,16 +46,34 @@ class Bot:
             # print(inputs)
 
             # Do the black magic and get output
-            output = self.brain.activate(inputs) if self.brain is not None else [0 for _ in range(18)]
+            outputs = self.brain.activate(inputs) if self.brain is not None else [0 for _ in range(18)]
 
-            if output[0] <= 0.25:
+            # Figure out which moves are available
+            lockedMove = None
+            if len(moveHistory) >= 3:
+                for move in moveHistory:
+                    if moveHistory.count(move) == len(moveHistory):
+                        lockedMove = move
+                        break
+
+            # Pick a direction
+            if outputs[0] <= 0.25:
                 direction = 'left'
-            elif output[0] <= 0.5:
+            elif outputs[0] <= 0.5:
                 direction = 'right'
-            elif output[0] <= 0.75:
+            elif outputs[0] <= 0.75:
                 direction = 'up'
             else:
                 direction = 'down'
+
+            # Pick a random direction if the move selected is locked
+            while direction == lockedMove:
+                direction = ['left', 'right', 'up', 'down'][randint(0, 3)]
+
+            # Update move history
+            moveHistory.append(direction)
+            if len(moveHistory) > 3:
+                moveHistory.pop(0)
 
             # Update board
             self.board.move(direction)
