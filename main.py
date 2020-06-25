@@ -82,6 +82,16 @@ if __name__ == '__main__':
     population.add_reporter(stats)
 
     # Train the population
-    winner = population.run(runGeneration)
+    winner = population.run(runGeneration, 1)
+
+
+
+    # ======== Testing ==============
+
+    bot = Bot()
+    bot.brain = neat.nn.FeedForwardNetwork.create(winner, config)
+    bot.useBrain(printGame=True)
+
+    # ================================
 
     # TODO: add visualization (https://neat-python.readthedocs.io/en/latest/xor_example.html)

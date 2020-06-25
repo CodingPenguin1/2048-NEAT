@@ -15,10 +15,13 @@ class Bot:
         self.fitness = self.board.score
         self.brain = None
 
-    def useBrain(self):
+    def useBrain(self, printGame=False):
         # 18 inputs: each cell of the board
         #            the count of nonzero cells
         # 1 output: direction to move
+
+        if printGame:
+            print(self.board, '\n')
 
         # Save the previous 3 moves to make sure it doesn't do the same thing over and over
         moveHistory = []
@@ -85,6 +88,9 @@ class Bot:
 
             # Update board
             self.board.move(direction)
+
+            if printGame:
+                print(self.board, '\n')
 
         # Update fitness
         self.fitness = self.board.score
