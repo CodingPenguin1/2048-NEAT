@@ -16,8 +16,9 @@ class Bot:
         self.brain = None
 
     def useBrain(self, printGame=False):
-        # 18 inputs: each cell of the board
+        # 86 inputs: each cell of the board
         #            the count of nonzero cells
+        #            preview of each of the 4 possible next-state boards and their scores
         # 1 output: direction to move
 
         if printGame:

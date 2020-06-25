@@ -82,7 +82,7 @@ if __name__ == '__main__':
     population.add_reporter(stats)
 
     # Train the population
-    winner = population.run(runGeneration, 1)
+    winner = population.run(runGeneration, 5)
 
 
 
