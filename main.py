@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import concurrent.futures
+from multiprocessing import cpu_count
 
 import neat
 from progress.bar import IncrementalBar
@@ -18,16 +19,16 @@ highTile = 0
 def runGenome(genome, genomeID, config):
     highScore = 0
     highTile = 0
-    genome.fitness = 0
+    fitness = 0
     for i in range(BOTS_PER_GENOME):
         bot = Bot()
         bot.brain = neat.nn.FeedForwardNetwork.create(genome, config)
         bot.useBrain()
-        genome.fitness += bot.fitness
+        fitness += bot.fitness
         if bot.fitness > highScore:
             highScore = bot.fitness
     # Average bot fitnesses to get overall genome fitness
-    genome.fitness /= BOTS_PER_GENOME
+    fitness /= BOTS_PER_GENOME
 
     # Get high tile
     for row in bot.board.array:
@@ -35,14 +36,14 @@ def runGenome(genome, genomeID, config):
             if cell > highTile:
                 highTile = cell
 
-    return genome.fitness, genomeID, highScore, highTile
+    return fitness, genomeID, highScore, highTile
 
 
 def runGeneration(genomes, config):
     global highScore, highTile
 
     # Create, run, and evalute the genomes
-    with concurrent.futures.ProcessPoolExecutor() as executor:
+    with concurrent.futures.ProcessPoolExecutor(cpu_count()) as executor:
         evaluatedGenomes = [executor.submit(runGenome, genome, genomeID, config) for (genomeID, genome) in genomes]
 
         with IncrementalBar('Running genomes', max=len(genomes)) as bar:

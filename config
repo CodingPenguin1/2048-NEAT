@@ -73,7 +73,7 @@ node_delete_prob = 0.09
 # Shape of brains
 num_hidden = 10
 num_inputs = 18
-num_outputs = 4
+num_outputs = 1
 
 # Default values from the XOR example
 # Node response options

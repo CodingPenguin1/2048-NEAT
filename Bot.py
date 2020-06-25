@@ -18,7 +18,7 @@ class Bot:
     def useBrain(self):
         # 18 inputs: each cell of the board
         #            the count of nonzero cells
-        # 4 outputs: how much it wants to go in each direction (take the highest value output)
+        # 1 output: direction to move
 
         # Run the bot until the game is over
         while not self.board.checkGameOver():
@@ -42,22 +42,17 @@ class Bot:
             inputs.append(1.0)
             # print(inputs)
 
-            # Do the black magic and get outputs
-            outputs = self.brain.activate(inputs) if self.brain is not None else [0 for _ in range(18)]
+            # Do the black magic and get output
+            output = self.brain.activate(inputs) if self.brain is not None else [0 for _ in range(18)]
 
-            # Try moves from highest to lowest value
-            # If a proposed move does nothing, try the next most favored
-            directions = ['left', 'right', 'up', 'down']
-            while True:
-                bestOption = outputs.index(max(outputs))
-                direction = directions[bestOption]
-
-                # See if move does anything
-                candidateArray = self.board.shift(direction, changeScore=False)
-                if not np.array_equal(candidateArray, self.board.array):
-                    break
-                else:
-                    outputs[bestOption] = -1
+            if output <= 0.25:
+                direction = 'left'
+            elif output <= 0.5:
+                direction = 'right'
+            elif output <= 0.75:
+                direction = 'up'
+            else:
+                direction = 'down'
 
             # Update board
             self.board.move(direction)
