@@ -41,12 +41,20 @@ class Bot:
                         nonZeroTileCount += 1
             inputs.append(nonZeroTileCount)
 
+            # Add peeks of the possible moves
+            for direction in ['left', 'right', 'up', 'down']:
+                arr, score = self.board.peek(direction)
+                for row in arr:
+                    for cell in row:
+                        inputs.append(cell)
+                inputs.append(score)
+
             # Reference value
             inputs.append(1.0)
             # print(inputs)
 
             # Do the black magic and get output
-            outputs = self.brain.activate(inputs) if self.brain is not None else [0 for _ in range(18)]
+            outputs = self.brain.activate(inputs) if self.brain is not None else [0 for _ in range(86)]
 
             # Figure out which moves are available
             lockedMove = None

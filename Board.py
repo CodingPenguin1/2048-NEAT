@@ -13,6 +13,33 @@ class Board:
 
         self.initialize()
 
+    def peek(self, direction):
+        arrayCopy = np.copy(self.array)
+        scoreCopy = self.score
+
+        if direction == 'left':
+            for i, row in enumerate(arrayCopy):
+                arrayCopy[i], scoreCopy = self.shiftRow(row, scoreOverride=scoreCopy)
+        elif direction == 'right':
+            arrayCopy = np.flip(arrayCopy, 1)
+            for i, row in enumerate(arrayCopy):
+                arrayCopy[i], scoreCopy = self.shiftRow(row, scoreOverride=scoreCopy)
+            arrayCopy = np.flip(arrayCopy, 1)
+        elif direction == 'up':
+            arrayCopy = np.transpose(arrayCopy)
+            for i, row in enumerate(arrayCopy):
+                arrayCopy[i], scoreCopy = self.shiftRow(row, scoreOverride=scoreCopy)
+            arrayCopy = np.transpose(arrayCopy)
+        else:
+            arrayCopy = np.transpose(arrayCopy)
+            arrayCopy = np.flip(arrayCopy, 1)
+            for i, row in enumerate(arrayCopy):
+                arrayCopy[i], scoreCopy = self.shiftRow(row, scoreOverride=scoreCopy)
+            arrayCopy = np.flip(arrayCopy, 1)
+            arrayCopy = np.transpose(arrayCopy)
+        return arrayCopy, scoreCopy
+
+
     def move(self, direction):
         if not self.gameOver:
             if direction == 'left':
@@ -42,9 +69,13 @@ class Board:
                 self.summonNewTile()
         return self.array
 
-    def shiftRow(self, row, debug=False):
+    def shiftRow(self, row, scoreOverride=-1, debug=False):
         # Shifts elements in a row, combining as necessary
         # Shifts the list "row" to the left
+
+        score = self.score
+        if scoreOverride != -1:
+            score = scoreOverride
 
         # Find first nonzero element
         minIndex = -1
@@ -75,7 +106,7 @@ class Board:
                 elif row[i] == row[prevNonzeroIndex]:
                     if debug:
                         print('combine')
-                    self.score += int(row[prevNonzeroIndex] * 2)
+                    score += int(row[prevNonzeroIndex] * 2)
                     row[prevNonzeroIndex] *= 2
                     row[i] = 0
                     nextIndex = prevNonzeroIndex + 1
@@ -88,7 +119,12 @@ class Board:
                     row[prevNonzeroIndex + 1] = row[i]
                     row[i] = 0
                     nextIndex = prevNonzeroIndex + 2
-        return row
+
+        if scoreOverride != -1:
+            return row, score
+        else:
+            self.score = score
+            return row
 
     def checkGameOver(self):
         for row in range(len(self.array)):
