@@ -16,7 +16,9 @@ class Bot:
         self.brain = None
 
     def useBrain(self):
-        # 16 inputs: each cell of the board scaled by log2(x)/(width*height)
+        # 86 inputs: each cell of the board scaled by log2(x)/(width*height+1)
+        #            the count of nonzero cells
+        #            each cell of the board that would result from each move and their scores
         # 4 outputs: how much it wants to go in each direction (take the highest value output)
 
         # Run the bot until the game is over
@@ -62,9 +64,6 @@ class Bot:
                 for i in nextBoardValues:
                     inputs.append(i)
                 inputs.append(score)
-
-
-
 
             # Reference value
             inputs.append(1.0)

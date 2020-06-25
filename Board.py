@@ -140,19 +140,3 @@ class Board:
 
     def __str__(self):
         return f'Score: {self.score}\n' + tabulate(self.array, tablefmt='plain')
-
-
-if __name__ == '__main__':
-    b = Board()
-
-    print(b)
-
-    while True:
-        direction = ['left', 'right', 'up', 'down'][randint(0, 3)]
-        print(str(b.gameOver) + '\n' + direction + '\n')
-        b.shift(direction)
-        print(b)
-        if b.gameOver:
-            print('Game over')
-            break
-        input()

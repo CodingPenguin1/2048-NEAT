@@ -8,7 +8,7 @@ import visualize
 from Bot import Bot
 
 # Global Constants
-BOTS_PER_GENOME = 5
+BOTS_PER_GENOME = 10
 
 # Global Vars
 highScore = 0
