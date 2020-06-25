@@ -45,11 +45,11 @@ class Bot:
             # Do the black magic and get output
             output = self.brain.activate(inputs) if self.brain is not None else [0 for _ in range(18)]
 
-            if output <= 0.25:
+            if output[0] <= 0.25:
                 direction = 'left'
-            elif output <= 0.5:
+            elif output[0] <= 0.5:
                 direction = 'right'
-            elif output <= 0.75:
+            elif output[0] <= 0.75:
                 direction = 'up'
             else:
                 direction = 'down'
