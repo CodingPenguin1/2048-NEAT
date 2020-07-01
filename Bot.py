@@ -38,22 +38,19 @@ class Bot:
             # ===== End Define Input Vector =====
 
             # Do the black magic and get output
-            outputs = self.brain.activate(inputs) if self.brain is not None else [0 for _ in range(len(inputs))]
+            outputs = self.brain.activate(inputs) if self.brain is not None else [0] * 4
 
-            # Make dictionary map activation values to moves
-            moves = {}
+            # Pick the best possible move
+            maxActivation = -10000000
+            direction = -1
             for i in range(len(outputs)):
-                moves[outputs[i]] = i
+                if outputs[i] > maxActivation and self.board.canMove(i):
+                    maxActivation = outputs[i]
+                    direction = i
 
-            # Pick the best possible move and move
-            outputs.sort()
-            outputs.reverse()
-            for activationValue in outputs:
-                direction = moves[activationValue]
-                if self.board.canMove(direction):
-                    self.board.move(direction)
-                    self.board.placeTile()
-                    break
+            # Move and place a new tile
+            self.board.move(direction)
+            self.board.placeTile()
 
             if printGame:
                 print(self.board, '\n', direction, '\n')
