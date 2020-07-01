@@ -9,7 +9,6 @@ from Board import Board
 class Bot:
     def __init__(self, boardSize=(4, 4)):
         self.board = Board(boardSize)
-        self.isRunning = True
 
         # For learning
         self.fitness = self.board.score
@@ -25,7 +24,7 @@ class Bot:
 
         # Run the bot until the game is over
         while not self.board.isGameOver():
-            # Define input vector
+            # ===== Define input vector =====
 
             # The board itself
             inputs = []
@@ -36,28 +35,28 @@ class Bot:
             # Reference value
             inputs.append(1.0)
 
+            # ===== End Define Input Vector =====
+
             # Do the black magic and get output
             outputs = self.brain.activate(inputs) if self.brain is not None else [0 for _ in range(len(inputs))]
 
             # Make dictionary map activation values to moves
             moves = {}
-            for i in range(outputs):
+            for i in range(len(outputs)):
                 moves[outputs[i]] = i
 
             # Pick the best possible move and move
             outputs.sort()
             outputs.reverse()
             for activationValue in outputs:
-                direction = board[activationValue]
+                direction = moves[activationValue]
                 if self.board.canMove(direction):
-                    board.move(direction)
+                    self.board.move(direction)
+                    self.board.placeTile()
                     break
 
             if printGame:
-                print(self.board, '\n')
+                print(self.board, '\n', direction, '\n')
 
         # Update fitness
         self.fitness = self.board.score
-
-        # Update isRunning of game is over
-        self.isRunning = self.board.isGameOver()

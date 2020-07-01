@@ -43,7 +43,7 @@ def runGeneration(genomes, config):
     global highScore, highTile
 
     # Create, run, and evalute the genomes
-    with concurrent.futures.ProcessPoolExecutor(cpu_count()) as executor:
+    with concurrent.futures.ProcessPoolExecutor(1) as executor:
         evaluatedGenomes = [executor.submit(runGenome, genome, genomeID, config) for (genomeID, genome) in genomes]
 
         with IncrementalBar('Running genomes', max=len(genomes)) as bar:

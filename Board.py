@@ -16,6 +16,8 @@ class Board():
         self.score = 0
         # If the computer gets good enough to exceed 32 bit integers, that's good enough for me
         self.tiles = np.zeros(size, np.int32)
+        self.placeTile()
+        self.placeTile()
 
     def canMove(self, direction):
         if direction == Board.UP:
@@ -141,4 +143,4 @@ class Board():
         return not (self.canMove(Board.UP) or self.canMove(Board.DOWN) or self.canMove(Board.LEFT) or self.canMove(Board.RIGHT))
 
     def __str__(self):
-        return f'Score: {self.score}\n' + tabulate(self.array, tablefmt='plain')
+        return f'Score: {self.score}\n' + tabulate(self.tiles, tablefmt='plain')
