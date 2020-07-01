@@ -31,7 +31,7 @@ def runGenome(genome, genomeID, config):
     fitness /= BOTS_PER_GENOME
 
     # Get high tile
-    for row in bot.board.array:
+    for row in bot.board.tiles:
         for cell in row:
             if cell > highTile:
                 highTile = cell
@@ -82,7 +82,7 @@ if __name__ == '__main__':
     population.add_reporter(stats)
 
     # Train the population
-    winner = population.run(runGeneration, 5)
+    winner = population.run(runGeneration)
 
 
 

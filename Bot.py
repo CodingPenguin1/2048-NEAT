@@ -8,7 +8,7 @@ from Board import Board
 
 class Bot:
     def __init__(self, boardSize=(4, 4)):
-        self.board = Board(boardSize[0], boardSize[1])
+        self.board = Board(boardSize)
         self.isRunning = True
 
         # For learning
@@ -16,61 +16,42 @@ class Bot:
         self.brain = None
 
     def useBrain(self, printGame=False):
-        # 86 inputs: each cell of the board
-        #            the count of nonzero cells
-        #            preview of each of the 4 possible next-state boards and their scores
-        # 1 output: direction to move
+        # 17 inputs: each cell of the board
+        #            reference 1.0
+        # 4 outputs: directions to move
 
         if printGame:
             print(self.board, '\n')
 
         # Run the bot until the game is over
-        while not self.board.checkGameOver():
+        while not self.board.isGameOver():
             # Define input vector
 
             # The board itself
             inputs = []
-            for row in range(len(self.board.array)):
-                for col in range(len(self.board.array[0])):
-                    inputs.append(self.board.array[row][col])
-
-            # The number of nonzero tiles
-            nonZeroTileCount = 0
-            for row in range(len(self.board.array)):
-                for col in range(len(self.board.array[0])):
-                    if self.board.array[row][col] != 0:
-                        nonZeroTileCount += 1
-            inputs.append(nonZeroTileCount)
-
-            # Add peeks of the possible moves
-            for direction in ['left', 'right', 'up', 'down']:
-                arr, score = self.board.peek(direction)
-                for row in arr:
-                    for cell in row:
-                        inputs.append(cell)
-                inputs.append(score)
+            for row in range(len(self.board.tiles)):
+                for col in range(len(self.board.tiles[0])):
+                    inputs.append(self.board.tiles[row][col])
 
             # Reference value
             inputs.append(1.0)
-            # print(inputs)
 
             # Do the black magic and get output
-            outputs = self.brain.activate(inputs) if self.brain is not None else [0 for _ in range(86)]
+            outputs = self.brain.activate(inputs) if self.brain is not None else [0 for _ in range(len(inputs))]
 
-            directions = ['left', 'right', 'up', 'down']
+            # Make dictionary map activation values to moves
+            moves = {}
+            for i in range(outputs):
+                moves[outputs[i]] = i
 
-            # Make all unavailable moves have tiny activation values
-            for i in range(len(outputs)):
-                if np.array_equal(self.board.peek(directions[i])[0], self.board.array):
-                    outputs[i] = -100000
-
-            # Pick the best output
-            maxActivation = max(outputs)
-            maxActivationIndex = outputs.index(maxActivation)
-            direction = directions[maxActivationIndex]
-
-            # Update board
-            self.board.move(direction)
+            # Pick the best possible move and move
+            outputs.sort()
+            outputs.reverse()
+            for activationValue in outputs:
+                direction = board[activationValue]
+                if self.board.canMove(direction):
+                    board.move(direction)
+                    break
 
             if printGame:
                 print(self.board, '\n')
@@ -79,4 +60,4 @@ class Bot:
         self.fitness = self.board.score
 
         # Update isRunning of game is over
-        self.isRunning = self.board.gameOver
+        self.isRunning = self.board.isGameOver()
