@@ -7,7 +7,7 @@ reset_on_extinction = False
 
 
 [DefaultStagnation]
-species_fitness_func = mean
+species_fitness_func = max
 max_stagnation = 10
 species_elitism = 2
 
@@ -49,8 +49,8 @@ bias_replace_rate = 0.1
 
 # When new generations are generated, genomes are considered compatible if they fall within
 # a certain distance of each other. This values determine how that distance is computed
-compatibility_disjoint_coefficient = 0.9
-compatibility_weight_coefficient = 0.75
+compatibility_disjoint_coefficient = 0.8
+compatibility_weight_coefficient = 0.4
 
 # The probability that connections will be added and subtracted between the nodes
 conn_add_prob = 0.3
@@ -64,7 +64,7 @@ enabled_mutate_rate = 0.01
 feed_forward = True
 
 # No brain to start with
-initial_connection = partial_direct 0.1
+initial_connection = partial_direct 0.9
 
 # Brains git bigger
 node_add_prob = 0.1
@@ -72,8 +72,8 @@ node_delete_prob = 0.09
 
 # Shape of brains
 num_hidden = 10
-num_inputs = 86
-num_outputs = 1
+num_inputs = 17
+num_outputs = 4
 
 # Default values from the XOR example
 # Node response options

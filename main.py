@@ -31,7 +31,7 @@ def runGenome(genome, genomeID, config):
     fitness /= BOTS_PER_GENOME
 
     # Get high tile
-    for row in bot.board.array:
+    for row in bot.board.tiles:
         for cell in row:
             if cell > highTile:
                 highTile = cell
@@ -83,5 +83,15 @@ if __name__ == '__main__':
 
     # Train the population
     winner = population.run(runGeneration)
+
+
+
+    # ======== Testing ==============
+
+    bot = Bot()
+    bot.brain = neat.nn.FeedForwardNetwork.create(winner, config)
+    bot.useBrain(printGame=True)
+
+    # ================================
 
     # TODO: add visualization (https://neat-python.readthedocs.io/en/latest/xor_example.html)
